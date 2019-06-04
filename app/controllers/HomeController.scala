@@ -22,6 +22,9 @@ import tools.Implicits
 
 
 
+/**
+  * A controller to handle the web app endPoint
+  */
 class HomeController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc)
   with Implicits {
   import PokemonForm._

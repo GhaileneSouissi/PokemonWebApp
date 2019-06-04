@@ -11,8 +11,13 @@ import play.api.mvc.{AnyContent, MessagesAbstractController, MessagesControllerC
 import scalaj.http.Http
 import tools.AppSettings.PokemonAkkaAPI.path
 
+
+/**
+  * A controller to handle comments sent by user
+  */
 class CommentController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc){
 
+  //redirect to comment Pokemon
   private val postCommentUrl = routes.CommentController.commentPokemon()
 
 
@@ -22,17 +27,18 @@ class CommentController @Inject()(cc: MessagesControllerComponents) extends Mess
       BadRequest(views.html.detail(Details(), formWithErrors, postCommentUrl))
     }
 
+
     val successFunction = { data: StatusData =>
       val pokemon = Pokemon(name = data.name)
       implicit val formats = DefaultFormats
       val jsonString = write(data)
 
       Http(path).postData(jsonString).header("content-type", "application/json").asString.code match {
-        case 200 => Ok("Comment sucessfully added..")
+        case 200 => Ok("Comment sucessfully added..") //TODO : specify real actions
         case _ => Ok("Error")
       }
     }
-    statusform.bindFromRequest.fold(errorFunction, successFunction)
+    statusform.bindFromRequest.fold(errorFunction, successFunction) // bind the values of the form
 
   }
 

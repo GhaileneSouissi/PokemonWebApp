@@ -13,6 +13,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
+
+/**
+  * A controller to handle the details returned by the Pokemon Service
+  */
 class DetailController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc)
   with Implicits{
   import PokemonForm._
@@ -33,7 +37,7 @@ class DetailController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: Data =>
       val pokemon = Pokemon(name = data.name)
-      Await.result(PokemonService.find(pokemon.name),5 seconds) match {
+      Await.result(PokemonService.find(pokemon.name),5 seconds) match { //the future is stopped here
         case Some(res) => Ok(views.html.detail(res,statusform,postCommentUrl))
         case _ =>  Ok("Pokemon Not found !!!")
       }

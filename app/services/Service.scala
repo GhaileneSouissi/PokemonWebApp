@@ -16,14 +16,18 @@ import scala.language.postfixOps
 import scala.reflect.ClassTag
 import tools.AppSettings.Client._
 
+/**
+  * A cache for the Poke Service API, it compute new values and stock it in a non permanent memory
+  * @tparam Key
+  * @tparam Details
+  */
 trait Service[Key <: String, Details <: PokemonDetails.Details] {
   final val JsonMimeType = "application/json"
   protected[this] val acceptHeader: (String, String) =
     "Accept" -> s"$JsonMimeType"
 
   protected[this] val cacheMaxSize: Int = cacheSize
-  val durations = cacheTTl.split(" ")
-  protected[this] val cacheTTL: FiniteDuration = Duration.create(durations(0).toLong,durations(1))
+  protected[this] val cacheTTL: FiniteDuration = cacheTTl
   protected[this] val cache: Cache[Key, Option[PokemonDetails.Details]] = CacheBuilder
     .newBuilder()
     .maximumSize(cacheMaxSize)
@@ -33,7 +37,7 @@ trait Service[Key <: String, Details <: PokemonDetails.Details] {
   def path(key: Key): String
 
 
-  def url(key: Key): String = s"https://pokeapi.co/api/v2/pokemon/${key}"
+  private def url(key: Key): String = s"https://pokeapi.co/api/v2/pokemon/${key}"
 
   protected[this] def compute(key: Key)
                              (implicit tag: ClassTag[PokemonDetails.Details],
@@ -51,7 +55,7 @@ trait Service[Key <: String, Details <: PokemonDetails.Details] {
 
           // Status 404: Not found
           case 404 =>
-            //println(s"Service responded 404 for ${request.url}")
+            //println(s"Service responded 404 for ${request.url}") //TODO; replace println by logger
             None
 
           // Status 415: Unsupported media type
