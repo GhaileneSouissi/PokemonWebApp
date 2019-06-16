@@ -1,4 +1,4 @@
-package tools
+package utils
 
 import com.typesafe.config.ConfigFactory
 
@@ -7,6 +7,7 @@ import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 object AppSettings {
 
   val appConfiguration = ConfigFactory.load()
+  val configuration = appConfiguration.getConfig("common")
 
   object Client {
 
@@ -29,3 +30,4 @@ object AppSettings {
 
 
 }
+

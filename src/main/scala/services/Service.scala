@@ -8,13 +8,15 @@ import models.PokemonDetails
 import models.PokemonDetails.{Details, stat}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import scalaj.http.Http
-import tools.AppSettings
+import utils.AppSettings
 
 import scala.concurrent.duration.{FiniteDuration, _}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.reflect.ClassTag
-import tools.AppSettings.Client._
+import utils.AppSettings.Client._
+import net.liftweb.json._
+import net.liftweb.json.Serialization.write
 
 /**
   * A cache for the Poke Service API, it compute new values and stock it in a non permanent memory
@@ -46,7 +48,7 @@ trait Service[Key <: String, Details <: PokemonDetails.Details] {
       .headers(acceptHeader)
       .timeout(connectTimeout, readTimeout)
 
-    Future(request.asBytes)
+    Future.successful(request.asBytes)
       .map { response =>
         response.code match {
           // Status 200: Success
@@ -111,7 +113,7 @@ trait Service[Key <: String, Details <: PokemonDetails.Details] {
       .zip(base_stat)
       .map(x => stat(x._1,x._2))
 
-    val sprite = new URL(((response \ "sprites").as[JsValue] \ "back_default").as[String])
+    val sprite = ((response \ "sprites").as[JsValue] \ "front_default").as[String]
 
     Details(
       name = name,
@@ -122,11 +124,14 @@ trait Service[Key <: String, Details <: PokemonDetails.Details] {
   }
 
   private[this] def bodyAsPokemonDetails(contentType: Option[String], body: Array[Byte])
-                                       (implicit tag: ClassTag[PokemonDetails.Details]): Option[PokemonDetails.Details] =
+                                        (implicit tag: ClassTag[PokemonDetails.Details]): Option[PokemonDetails.Details] =
+
 
     contentType.flatMap{_ =>
       val jsonString = body.map(_.toChar).mkString
       Some(read(Json.parse(jsonString)))
     }
+
+
 }
 

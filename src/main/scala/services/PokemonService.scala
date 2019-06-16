@@ -1,7 +1,7 @@
 package services
 
 import models.PokemonDetails.Details
-import tools.AppSettings.PokemonServiceConf
+import utils.AppSettings.PokemonServiceConf
 
 /**
   * A pokemon service , it calls the cache
