@@ -3,7 +3,7 @@ package models
 import java.net.URL
 
 
-object PokemonDetails {
+object  PokemonDetails {
 
   case class stat(name: String, baseStat: Int)
 
